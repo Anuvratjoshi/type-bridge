@@ -1,0 +1,29 @@
+{
+  "input": "backend/src",
+  "outDir": "frontend/src/types/generated",
+  "include": ["**/*.ts"],
+  "exclude": ["**/*.test.ts", "**/*.spec.ts", "**/*.d.ts"],
+  "cleanOutput": true,
+  "generateSDK": false,
+  "preserveDate": false,
+  "preserveEnums": false,
+  "excludeFields": [
+    "password",
+    "passwordHash",
+    "token",
+    "refreshToken",
+    "secret",
+    "accessToken"
+  ],
+  "excludeTypes": [
+    "Document",
+    "Model",
+    "Schema",
+    "Request",
+    "Response",
+    "NextFunction",
+    "Express"
+  ],
+  "prettier": true,
+  "addHashHeader": true
+}

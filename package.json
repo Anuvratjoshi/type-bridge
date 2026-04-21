@@ -1,0 +1,66 @@
+{
+  "name": "type-bridge",
+  "version": "1.0.0",
+  "description": "Automatically sync backend TypeScript types to the frontend — zero manual duplication.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "type-bridge": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "dev": "tsc --project tsconfig.build.json --watch",
+    "clean": "rm -rf dist",
+    "test": "jest --runInBand --forceExit",
+    "test:watch": "jest --watch",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\""
+  },
+  "keywords": [
+    "typescript",
+    "types",
+    "codegen",
+    "sync",
+    "backend",
+    "frontend",
+    "cli"
+  ],
+  "author": "Anuvratjoshi",
+  "license": "MIT",
+  "homepage": "https://github.com/Anuvratjoshi/type-bridge#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Anuvratjoshi/type-bridge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Anuvratjoshi/type-bridge/issues"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "chokidar": "^3.6.0",
+    "commander": "^12.1.0",
+    "cosmiconfig": "^9.0.0",
+    "glob": "^10.4.5",
+    "ora": "^8.1.1",
+    "prettier": "^2.8.8",
+    "ts-morph": "^23.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/node": "^20.16.5",
+    "@types/prettier": "^2.7.3",
+    "@typescript-eslint/eslint-plugin": "^8.7.0",
+    "@typescript-eslint/parser": "^8.7.0",
+    "eslint": "^9.11.1",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.6.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}
