@@ -33,7 +33,7 @@ my-app/
 ### `type-bridge.config.ts`
 
 ```ts
-import type { TypeBridgeConfig } from "type-bridge";
+import type { TypeBridgeConfig } from "@joshianuvrat/type-bridge";
 
 const config: TypeBridgeConfig = {
   input: "backend/src",
@@ -85,7 +85,7 @@ export interface LoginResponse {
 ### Run
 
 ```bash
-npx type-bridge generate
+npx @joshianuvrat/type-bridge generate
 ```
 
 ### Generated output
@@ -190,7 +190,7 @@ export class UserResponseDto {
 ### `type-bridge.config.ts`
 
 ```ts
-import type { TypeBridgeConfig } from "type-bridge";
+import type { TypeBridgeConfig } from "@joshianuvrat/type-bridge";
 
 const config: TypeBridgeConfig = {
   input: "backend/src",
@@ -277,7 +277,7 @@ monorepo/
 
 ```ts
 // packages/users-service/type-bridge.config.ts
-import type { TypeBridgeConfig } from "type-bridge";
+import type { TypeBridgeConfig } from "@joshianuvrat/type-bridge";
 
 export default {
   input: "src",
@@ -287,7 +287,7 @@ export default {
 
 ```ts
 // packages/posts-service/type-bridge.config.ts
-import type { TypeBridgeConfig } from "type-bridge";
+import type { TypeBridgeConfig } from "@joshianuvrat/type-bridge";
 
 export default {
   input: "src",
@@ -310,7 +310,7 @@ export default {
 
 ```ts
 // scripts/generate-all-types.ts
-import { loadConfig, runPipeline } from "type-bridge";
+import { loadConfig, runPipeline } from "@joshianuvrat/type-bridge";
 import path from "path";
 
 const services = ["packages/users-service", "packages/posts-service"];
@@ -356,7 +356,7 @@ jobs:
         run: npm ci
 
       - name: Generate types
-        run: npx type-bridge generate --no-prettier
+        run: npx @joshianuvrat/type-bridge generate --no-prettier
 
       - name: Type-check backend
         run: npx tsc --project backend/tsconfig.json --noEmit
@@ -371,7 +371,7 @@ Add a script that compares the hash embedded in generated files against a fresh 
 
 ```ts
 // scripts/check-types-fresh.ts
-import { loadConfig, runExtractor, runTransformer } from "type-bridge";
+import { loadConfig, runExtractor, runTransformer } from "@joshianuvrat/type-bridge";
 import { computeHash } from "type-bridge/dist/core/generator";
 import fs from "fs";
 import path from "path";
@@ -409,7 +409,7 @@ async function main() {
   }
 
   if (stale) {
-    console.error("\nRun `npx type-bridge generate` to refresh.");
+    console.error("\nRun `npx @joshianuvrat/type-bridge generate` to refresh.");
     process.exit(1);
   }
 
@@ -425,7 +425,7 @@ main().catch(console.error);
 
 ```ts
 // type-bridge.config.ts
-import type { TypeBridgeConfig } from "type-bridge";
+import type { TypeBridgeConfig } from "@joshianuvrat/type-bridge";
 
 export default {
   input: "src/server",
@@ -488,12 +488,12 @@ my-app/                         ← shared repo root
 **1. Install and configure TypeBridge:**
 
 ```bash
-npm install --save-dev type-bridge
+npm install --save-dev @joshianuvrat/type-bridge
 ```
 
 ```ts
 // type-bridge.config.ts
-import type { TypeBridgeConfig } from "type-bridge";
+import type { TypeBridgeConfig } from "@joshianuvrat/type-bridge";
 
 export default {
   input: "backend/src",
@@ -690,7 +690,7 @@ jobs:
 
       # Step 1 — always generate fresh types
       - name: Generate types
-        run: npx type-bridge generate --no-prettier
+        run: npx @joshianuvrat/type-bridge generate --no-prettier
 
       # Step 2 — type-check the frontend against them
       - name: Type-check frontend
@@ -710,7 +710,7 @@ If the backend changed a type contract and the frontend wasn't updated, the
 
 ```bash
 npx husky init
-echo 'npx type-bridge generate --no-prettier && git add frontend/src/types/generated/' > .husky/pre-commit
+echo 'npx @joshianuvrat/type-bridge generate --no-prettier && git add frontend/src/types/generated/' > .husky/pre-commit
 ```
 
 This auto-regenerates and stages the updated types on every `git commit` so

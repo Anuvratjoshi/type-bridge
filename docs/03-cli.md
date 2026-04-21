@@ -3,7 +3,7 @@
 TypeBridge ships a single binary: `type-bridge`.
 
 ```bash
-npx type-bridge <command> [options]
+npx @joshianuvrat/type-bridge <command> [options]
 ```
 
 ---
@@ -16,10 +16,10 @@ npx type-bridge <command> [options]
 | `-h, --help` | Show help for any command |
 
 ```bash
-npx type-bridge --version
+npx @joshianuvrat/type-bridge --version
 # 1.0.0
 
-npx type-bridge generate --help
+npx @joshianuvrat/type-bridge generate --help
 ```
 
 ---
@@ -31,7 +31,7 @@ npx type-bridge generate --help
 Runs the full Extract → Transform → Generate pipeline once and exits.
 
 ```bash
-npx type-bridge generate [options]
+npx @joshianuvrat/type-bridge generate [options]
 ```
 
 ### Options
@@ -50,43 +50,43 @@ npx type-bridge generate [options]
 **Basic usage — uses `type-bridge.config.ts` in the current directory:**
 
 ```bash
-npx type-bridge generate
+npx @joshianuvrat/type-bridge generate
 ```
 
 **Override the output directory without editing the config:**
 
 ```bash
-npx type-bridge generate --outDir src/types/api
+npx @joshianuvrat/type-bridge generate --outDir src/types/api
 ```
 
 **Generate types AND a typed SDK client in one command:**
 
 ```bash
-npx type-bridge generate --sdk
+npx @joshianuvrat/type-bridge generate --sdk
 ```
 
 **Run from a different working directory (monorepo root targeting a package):**
 
 ```bash
-npx type-bridge generate --cwd packages/api
+npx @joshianuvrat/type-bridge generate --cwd packages/api
 ```
 
 **Fast CI run — skip Prettier to save time:**
 
 ```bash
-npx type-bridge generate --no-prettier
+npx @joshianuvrat/type-bridge generate --no-prettier
 ```
 
 **Incremental run — keep existing files, only add new ones:**
 
 ```bash
-npx type-bridge generate --no-clean
+npx @joshianuvrat/type-bridge generate --no-clean
 ```
 
 **Use a non-standard config file path:**
 
 ```bash
-npx type-bridge generate --config ./config/type-bridge.prod.ts
+npx @joshianuvrat/type-bridge generate --config ./config/type-bridge.prod.ts
 ```
 
 ### Console output
@@ -114,7 +114,7 @@ Watches your backend source directory and automatically re-runs `generate`
 whenever a file changes.
 
 ```bash
-npx type-bridge watch [options]
+npx @joshianuvrat/type-bridge watch [options]
 ```
 
 ### Options
@@ -139,19 +139,19 @@ npx type-bridge watch [options]
 **Standard watch — rebuild on any change:**
 
 ```bash
-npx type-bridge watch
+npx @joshianuvrat/type-bridge watch
 ```
 
 **Watch in a monorepo sub-package:**
 
 ```bash
-npx type-bridge watch --cwd packages/api
+npx @joshianuvrat/type-bridge watch --cwd packages/api
 ```
 
 **Watch with SDK generation:**
 
 ```bash
-npx type-bridge watch --sdk
+npx @joshianuvrat/type-bridge watch --sdk
 ```
 
 ### Console output (live session)
@@ -182,7 +182,7 @@ Nothing is generated. Use this to verify your config is being picked up
 correctly.
 
 ```bash
-npx type-bridge info [options]
+npx @joshianuvrat/type-bridge info [options]
 ```
 
 ### Options
@@ -196,13 +196,13 @@ npx type-bridge info [options]
 **Check resolved config in the current directory:**
 
 ```bash
-npx type-bridge info
+npx @joshianuvrat/type-bridge info
 ```
 
 **Check config for a sub-package:**
 
 ```bash
-npx type-bridge info --cwd packages/users-service
+npx @joshianuvrat/type-bridge info --cwd packages/users-service
 ```
 
 ### Console output

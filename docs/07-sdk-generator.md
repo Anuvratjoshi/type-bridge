@@ -11,7 +11,7 @@ without writing any boilerplate fetch code.
 
 ```ts
 // type-bridge.config.ts
-import type { TypeBridgeConfig } from "type-bridge";
+import type { TypeBridgeConfig } from "@joshianuvrat/type-bridge";
 
 export default {
   input:       "backend/src",
@@ -23,7 +23,7 @@ export default {
 Or on a one-off basis with a CLI flag:
 
 ```bash
-npx type-bridge generate --sdk
+npx @joshianuvrat/type-bridge generate --sdk
 ```
 
 ---

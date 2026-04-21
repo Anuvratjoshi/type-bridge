@@ -7,7 +7,7 @@
 Before diving into the sections below, run:
 
 ```bash
-npx type-bridge info
+npx @joshianuvrat/type-bridge info
 ```
 
 This prints the fully-resolved config. Verify that `input`, `outDir`,
@@ -27,13 +27,13 @@ This prints the fully-resolved config. Verify that `input`, `outDir`,
 
 **Causes and fixes:**
 
-| Cause | Fix |
-|---|---|
-| `input` path does not exist | Check the path is relative to `cwd` (which defaults to where you run the command). Use `--cwd` if needed. |
-| No files match `include` patterns | The defaults only match `**/*.ts`. If your files are `.tsx` add `"**/*.tsx"` to `include`. |
-| All matching declarations are non-exported | Make sure your types/interfaces use `export`. TypeBridge only processes exported declarations. |
-| All declarations are filtered by `excludeTypes` | Run `type-bridge info` to see your `excludeTypes` list. |
-| All files match `exclude` patterns | Your file name (e.g. `user.dto.ts`) may accidentally match an `exclude` glob. |
+| Cause                                           | Fix                                                                                                       |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `input` path does not exist                     | Check the path is relative to `cwd` (which defaults to where you run the command). Use `--cwd` if needed. |
+| No files match `include` patterns               | The defaults only match `**/*.ts`. If your files are `.tsx` add `"**/*.tsx"` to `include`.                |
+| All matching declarations are non-exported      | Make sure your types/interfaces use `export`. TypeBridge only processes exported declarations.            |
+| All declarations are filtered by `excludeTypes` | Run `type-bridge info` to see your `excludeTypes` list.                                                   |
+| All files match `exclude` patterns              | Your file name (e.g. `user.dto.ts`) may accidentally match an `exclude` glob.                             |
 
 ---
 
@@ -43,10 +43,11 @@ All extracted declarations were dropped by the Transformer.
 Check these config keys:
 
 ```bash
-npx type-bridge info | grep -E '"excludeTypes|excludeFields"'
+npx @joshianuvrat/type-bridge info | grep -E '"excludeTypes|excludeFields"'
 ```
 
 Common causes:
+
 - The type name exactly matches an entry in `excludeTypes` (e.g. your type is named `Response` or `Model`)
 - Every property in every interface is in `excludeFields`
 
@@ -57,13 +58,14 @@ Common causes:
 TypeBridge always regenerates from scratch (unless `cleanOutput: false`).
 
 If stale files remain:
+
 1. Confirm `cleanOutput: true` (default) in your config
-2. Delete the `outDir` manually and re-run: `npx type-bridge generate`
+2. Delete the `outDir` manually and re-run: `npx @joshianuvrat/type-bridge generate`
 
 To prevent stale files in CI, add a type-generation step before your type-check:
 
 ```yaml
-- run: npx type-bridge generate --no-prettier
+- run: npx @joshianuvrat/type-bridge generate --no-prettier
 - run: npx tsc --noEmit
 ```
 
@@ -94,10 +96,10 @@ Or switch to a JSON config:
 
 ### `Cannot find module 'type-bridge'` in config file
 
-The config file imports from `"type-bridge"` for the type annotation:
+The config file imports from `"@joshianuvrat/type-bridge"` for the type annotation:
 
 ```ts
-import type { TypeBridgeConfig } from "type-bridge";
+import type { TypeBridgeConfig } from "@joshianuvrat/type-bridge";
 ```
 
 If TypeBridge is not yet installed, the import fails.
@@ -105,7 +107,7 @@ If TypeBridge is not yet installed, the import fails.
 **Fix:** Install TypeBridge first, then create the config:
 
 ```bash
-npm install --save-dev type-bridge
+npm install --save-dev @joshianuvrat/type-bridge
 ```
 
 ---
@@ -116,6 +118,7 @@ TypeBridge catches Prettier errors internally and falls back to unformatted
 output — it will **never** crash because of a formatting failure.
 
 If you see formatting issues:
+
 1. Ensure Prettier is installed: `npm install --save-dev prettier`
 2. Add a `.prettierrc` if you want consistent formatting
 3. Or disable formatting entirely: `prettier: false`
@@ -130,7 +133,7 @@ If you see formatting issues:
 
 ```ts
 // type-bridge.config.ts
-tsConfigFilePath: "backend/tsconfig.json"
+tsConfigFilePath: "backend/tsconfig.json";
 ```
 
 ---
@@ -160,8 +163,8 @@ outDir: "src/generated",
 TypeBridge uses a simple regex. Routes must be registered as:
 
 ```ts
-app.get("/path", handler)
-router.post("/path", handler)
+app.get("/path", handler);
+router.post("/path", handler);
 ```
 
 Routes registered via loops, factory functions, or frameworks other than
@@ -279,10 +282,10 @@ standard TypeScript interfaces and types).
 
 ## Still stuck?
 
-1. Run `npx type-bridge info` and verify the resolved config
+1. Run `npx @joshianuvrat/type-bridge info` and verify the resolved config
 2. Check the [Edge Cases](./06-edge-cases.md) guide
 3. Add `@type-bridge-ignore` to any declaration causing issues and file a bug
 4. Open an issue with:
-   - Your TypeBridge version (`npx type-bridge --version`)
-   - Your resolved config (`npx type-bridge info`)
+   - Your TypeBridge version (`npx @joshianuvrat/type-bridge --version`)
+   - Your resolved config (`npx @joshianuvrat/type-bridge info`)
    - The backend type that causes the problem

@@ -1,5 +1,5 @@
 {
-  "name": "type-bridge",
+  "name": "@joshianuvrat/type-bridge",
   "version": "1.0.0",
   "description": "Automatically sync backend TypeScript types to the frontend — zero manual duplication.",
   "main": "dist/index.js",
@@ -30,7 +30,7 @@
   "homepage": "https://github.com/Anuvratjoshi/type-bridge#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Anuvratjoshi/type-bridge.git"
+    "url": "git+https://github.com/Anuvratjoshi/type-bridge.git"
   },
   "bugs": {
     "url": "https://github.com/Anuvratjoshi/type-bridge/issues"

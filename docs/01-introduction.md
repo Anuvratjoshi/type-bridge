@@ -97,13 +97,13 @@ export interface User {
 
 ```bash
 # As a dev dependency (recommended)
-npm install --save-dev type-bridge
+npm install --save-dev @joshianuvrat/type-bridge
 
 # yarn
-yarn add -D type-bridge
+yarn add -D @joshianuvrat/type-bridge
 
 # pnpm
-pnpm add -D type-bridge
+pnpm add -D @joshianuvrat/type-bridge
 ```
 
 > TypeBridge is a **dev dependency** — it generates files at build time and is
@@ -119,7 +119,7 @@ At the root of your repository create `type-bridge.config.ts`:
 
 ```ts
 // type-bridge.config.ts
-import type { TypeBridgeConfig } from "type-bridge";
+import type { TypeBridgeConfig } from "@joshianuvrat/type-bridge";
 
 const config: TypeBridgeConfig = {
   input: "backend/src", // where your backend types live
@@ -156,7 +156,7 @@ export interface CreateUserDTO {
 ### 3. Run the generator
 
 ```bash
-npx type-bridge generate
+npx @joshianuvrat/type-bridge generate
 ```
 
 Console output:
@@ -221,7 +221,7 @@ export function ProfileCard({ user }: Props) {
 ```
 
 **Done.** You never touch the frontend types again — just re-run
-`npx type-bridge generate` when the backend changes.
+`npx @joshianuvrat/type-bridge generate` when the backend changes.
 
 ---
 
@@ -254,7 +254,7 @@ Regenerate them as part of CI before type-checking:
 ```yaml
 # .github/workflows/ci.yml  (excerpt)
 - name: Generate types
-  run: npx type-bridge generate
+  run: npx @joshianuvrat/type-bridge generate
 
 - name: Type-check frontend
   run: npx tsc --noEmit
@@ -273,7 +273,7 @@ Here is exactly what each person does.
 1. Install TypeBridge at the repo root:
 
 ```bash
-npm install --save-dev type-bridge
+npm install --save-dev @joshianuvrat/type-bridge
 ```
 
 2. Create `type-bridge.config.ts` at the repo root:
@@ -406,7 +406,7 @@ jobs:
       - run: npm ci
 
       # Always generate types before type-checking
-      - run: npx type-bridge generate --no-prettier
+      - run: npx @joshianuvrat/type-bridge generate --no-prettier
 
       # Now type-check the frontend against freshly generated types
       - run: npx tsc --project frontend/tsconfig.json --noEmit
@@ -425,7 +425,7 @@ every commit:
 
 ```bash
 npx husky init
-echo 'npx type-bridge generate --no-prettier' > .husky/pre-commit
+echo 'npx @joshianuvrat/type-bridge generate --no-prettier' > .husky/pre-commit
 ```
 
 Now `type-bridge generate` runs automatically every time anyone on the team

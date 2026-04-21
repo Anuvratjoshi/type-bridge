@@ -23,7 +23,7 @@ TypeBridge accepts any of these file names (searched in order):
 
 ```ts
 // type-bridge.config.ts
-import type { TypeBridgeConfig } from "type-bridge";
+import type { TypeBridgeConfig } from "@joshianuvrat/type-bridge";
 
 const config: TypeBridgeConfig = {
   input:  "backend/src",
@@ -355,7 +355,7 @@ file against a freshly generated hash).
 
 ```ts
 // type-bridge.config.ts
-import type { TypeBridgeConfig } from "type-bridge";
+import type { TypeBridgeConfig } from "@joshianuvrat/type-bridge";
 
 const config: TypeBridgeConfig = {
   // ── Input ──────────────────────────────────────────────────────────────
@@ -395,7 +395,7 @@ Run this to see exactly what config TypeBridge will use (after merging defaults
 with your overrides):
 
 ```bash
-npx type-bridge info
+npx @joshianuvrat/type-bridge info
 ```
 
 Example output:

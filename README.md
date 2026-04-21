@@ -92,10 +92,10 @@ Optionally, the **SDK Generator** scans Express route registrations and emits a 
 
 ```bash
 # As a dev dependency in your project
-npm install --save-dev type-bridge
+npm install --save-dev @joshianuvrat/type-bridge
 
 # Or globally
-npm install -g type-bridge
+npm install -g @joshianuvrat/type-bridge
 ```
 
 > **Node.js ≥ 18** is required.
@@ -107,14 +107,14 @@ npm install -g type-bridge
 1. **Install**
 
    ```bash
-   npm install --save-dev type-bridge
+   npm install --save-dev @joshianuvrat/type-bridge
    ```
 
 2. **Create a config file** at the root of your repository:
 
    ```ts
    // type-bridge.config.ts
-   import type { TypeBridgeConfig } from "type-bridge";
+   import type { TypeBridgeConfig } from "@joshianuvrat/type-bridge";
 
    const config: TypeBridgeConfig = {
      input: "backend/src",
@@ -127,7 +127,7 @@ npm install -g type-bridge
 3. **Generate**
 
    ```bash
-   npx type-bridge generate
+   npx @joshianuvrat/type-bridge generate
    ```
 
 4. **Import in your frontend**
@@ -244,7 +244,7 @@ interface TypeBridgeConfig {
 ### generate
 
 ```
-npx type-bridge generate [options]
+npx @joshianuvrat/type-bridge generate [options]
 ```
 
 | Option | Description |
@@ -259,7 +259,7 @@ npx type-bridge generate [options]
 **Example:**
 
 ```bash
-npx type-bridge generate --outDir src/types/api --sdk
+npx @joshianuvrat/type-bridge generate --outDir src/types/api --sdk
 ```
 
 ---
@@ -267,7 +267,7 @@ npx type-bridge generate --outDir src/types/api --sdk
 ### watch
 
 ```
-npx type-bridge watch [options]
+npx @joshianuvrat/type-bridge watch [options]
 ```
 
 Watches the source directory and re-runs `generate` on every change. Uses a 300 ms debounce to batch rapid saves.
@@ -281,7 +281,7 @@ Watches the source directory and re-runs `generate` on every change. Uses a 300 
 **Example:**
 
 ```bash
-npx type-bridge watch
+npx @joshianuvrat/type-bridge watch
 ```
 
 Press `Ctrl + C` to stop.
@@ -291,7 +291,7 @@ Press `Ctrl + C` to stop.
 ### info
 
 ```
-npx type-bridge info
+npx @joshianuvrat/type-bridge info
 ```
 
 Prints the resolved, fully-merged configuration as JSON and exits. Useful for debugging.
@@ -303,7 +303,7 @@ Prints the resolved, fully-merged configuration as JSON and exits. Useful for de
 You can use TypeBridge as a library instead of a CLI tool:
 
 ```ts
-import { loadConfig, runPipeline } from "type-bridge";
+import { loadConfig, runPipeline } from "@joshianuvrat/type-bridge";
 
 const config = await loadConfig("/path/to/project");
 const result = await runPipeline({ config, cwd: "/path/to/project" });
@@ -459,7 +459,7 @@ Currently TypeBridge uses `unknown` for body/response types when it cannot infer
 ## Watch Mode
 
 ```
-npx type-bridge watch
+npx @joshianuvrat/type-bridge watch
 ```
 
 Watch mode:
@@ -551,7 +551,7 @@ Tests are written with **Jest + ts-jest**. Each module has its own `__tests__/` 
 
 - Check that `input` points to a directory that actually contains `.ts` files.
 - Make sure the types you want synced are `export`-ed.
-- Run `npx type-bridge info` to see the resolved config.
+- Run `npx @joshianuvrat/type-bridge info` to see the resolved config.
 
 ### Prettier errors on generated files
 
