@@ -35,8 +35,8 @@ Thumbs.db
 # Root config (dev artifact, not part of the library)
 type-bridge.config.ts
 
-# Smoke-test generated output (regenerated on demand)
-smoke-test/frontend/src/types/generated/
+# Smoke-test generated output
+smoke-test
 
 # TypeScript build info cache
 *.tsbuildinfo
