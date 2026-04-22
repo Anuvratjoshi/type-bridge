@@ -2,16 +2,20 @@
 
 > **Automatically sync backend TypeScript types to your frontend — zero manual duplication.**
 
-TypeBridge is a CLI tool and library that parses your backend TypeScript source, strips backend-only constructs (Mongoose Documents, Express Request/Response, sensitive fields, etc.), and emits clean, tree-shakable type files ready for your frontend to import.
+TypeBridge is a CLI tool and Node.js library that parses your backend TypeScript source, strips backend-only constructs (Mongoose `Document`, Express `Request`/`Response`, sensitive fields like `password`, etc.), and emits clean, tree-shakable type files ready for your frontend to import.
+
+[![npm](https://img.shields.io/npm/v/@joshianuvrat/type-bridge)](https://www.npmjs.com/package/@joshianuvrat/type-bridge)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
 ## Table of Contents
 
-- [Why TypeBridge?](#why-type-bridge)
+- [Why TypeBridge?](#why-typebridge)
 - [How It Works](#how-it-works)
 - [Installation](#installation)
 - [Quick Start](#quick-start)
+- [Live Example — Smoke Test](#live-example--smoke-test)
 - [Configuration](#configuration)
   - [All Options](#all-options)
 - [CLI Reference](#cli-reference)
@@ -43,12 +47,12 @@ TypeBridge is a CLI tool and library that parses your backend TypeScript source,
 
 In a typical MERN + TypeScript setup you define types once on the backend and then **re-define the same types manually on the frontend**. This creates:
 
-| Problem | Impact |
-|---|---|
-| Type duplication | Violates DRY; maintenance overhead |
-| Contract drift | Frontend & backend types silently diverge |
+| Problem           | Impact                                        |
+| ----------------- | --------------------------------------------- |
+| Type duplication  | Violates DRY; maintenance overhead            |
+| Contract drift    | Frontend & backend types silently diverge     |
 | Painful refactors | You must update types in two (or more) places |
-| Security risks | Sensitive fields can accidentally leak |
+| Security risks    | Sensitive fields can accidentally leak        |
 
 TypeBridge solves all of this with a **build-time automation pipeline**.
 
@@ -140,17 +144,311 @@ That's it. The generated files are **never committed** — add them to `.gitigno
 
 ---
 
+## Live Example — Smoke Test
+
+The repository includes a fully working `smoke-test/` folder that demonstrates exactly what TypeBridge does end-to-end. Here's a complete walkthrough of it.
+
+### Folder layout
+
+```
+smoke-test/
+├── type-bridge.config.ts          ← config pointing to the backend below
+├── backend/
+│   └── src/
+│       ├── models/
+│       │   ├── user.model.ts      ← IUser, CreateUserDTO, UpdateUserDTO …
+│       │   └── post.model.ts      ← IPost, PostStatus enum, CreatePostDTO …
+│       └── dtos/
+│           └── auth.dto.ts        ← LoginDTO, LoginResponse, @type-bridge-ignore demo
+└── frontend/
+    └── src/
+        └── types/
+            └── generated/         ← output written by TypeBridge (gitignored)
+                ├── user.model.ts
+                ├── post.model.ts
+                ├── auth.dto.ts
+                └── index.ts       ← barrel re-export
+```
+
+### The config
+
+```ts
+// smoke-test/type-bridge.config.ts
+import type { TypeBridgeConfig } from "@joshianuvrat/type-bridge";
+import { DEFAULT_CONFIG } from "@joshianuvrat/type-bridge";
+
+const config: TypeBridgeConfig = {
+  input: "backend/src",
+  outDir: "frontend/src/types/generated",
+  include: ["**/*.ts"],
+  exclude: ["**/*.test.ts", "**/*.spec.ts", "**/*.d.ts"],
+
+  cleanOutput: true,
+  generateSDK: false,
+  preserveDate: false, // Date → string
+  preserveEnums: false, // enums → union types
+
+  excludeFields: [
+    ...DEFAULT_CONFIG.excludeFields, // password, passwordHash, token, refreshToken, secret
+    "accessToken",
+    "apiKey",
+    "twoFactorSecret",
+  ],
+  excludeTypes: [
+    "Document",
+    "Model",
+    "Schema",
+    "Request",
+    "Response",
+    "NextFunction",
+    "Express",
+  ],
+
+  prettier: true,
+  addHashHeader: true,
+};
+
+export default config;
+```
+
+### Backend input files
+
+**`user.model.ts`** — simulates a Mongoose + TypeScript model:
+
+```ts
+export type UserRole = "admin" | "moderator" | "user";
+
+export interface IUser {
+  _id: string;
+  name: string;
+  email: string;
+  password: string; // ← STRIPPED (in excludeFields)
+  passwordHash: string; // ← STRIPPED
+  token: string; // ← STRIPPED
+  refreshToken: string; // ← STRIPPED
+  role: UserRole;
+  isVerified: boolean;
+  isActive: boolean;
+  profile: UserProfile;
+  followersCount: number;
+  followingCount: number;
+  postsCount: number;
+  lastLoginAt: Date; // ← becomes string
+  createdAt: Date; // ← becomes string
+  updatedAt: Date; // ← becomes string
+}
+
+export interface CreateUserDTO {
+  name: string;
+  email: string;
+  password: string; // ← STRIPPED
+  role?: UserRole;
+}
+```
+
+**`post.model.ts`** — demonstrates enum-to-union conversion:
+
+```ts
+export enum PostStatus {
+  Draft = "draft",
+  Published = "published",
+  Scheduled = "scheduled",
+  Archived = "archived",
+}
+
+export interface IPost {
+  _id: string;
+  title: string;
+  content: string;
+  status: PostStatus; // ← becomes union type
+  tags: string[];
+  likesCount: number;
+  publishedAt?: Date; // ← becomes string
+  createdAt: Date; // ← becomes string
+  updatedAt: Date; // ← becomes string
+}
+```
+
+**`auth.dto.ts`** — demonstrates `@type-bridge-ignore`:
+
+```ts
+export interface LoginDTO {
+  email: string;
+  password: string; // ← STRIPPED
+}
+
+export interface LoginResponse {
+  accessToken: string; // ← STRIPPED (in excludeFields)
+  refreshToken: string; // ← STRIPPED
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: "admin" | "user";
+  };
+}
+
+/**
+ * @type-bridge-ignore
+ * Internal type — never reaches the frontend.
+ */
+export interface InternalServerMetadata {
+  dbConnectionString: string;
+  redisUrl: string;
+}
+```
+
+### Run it yourself
+
+From the project root:
+
+```bash
+npx tsx dist/cli/index.js generate --cwd smoke-test
+```
+
+Or after installing from npm in your own project:
+
+```bash
+npx @joshianuvrat/type-bridge generate --cwd smoke-test
+```
+
+### Generated output
+
+**`frontend/src/types/generated/user.model.ts`**
+
+```ts
+// type-bridge — generated from: user.model.ts
+// Hash: a2f7fd341fc7
+// Do NOT edit manually. Re-run `type-bridge generate` to refresh.
+
+export interface UserAddress {
+  street: string;
+  city: string;
+  country: string;
+  zipCode?: string;
+}
+
+export interface UserProfile {
+  bio?: string;
+  avatarUrl?: string;
+  website?: string;
+  location?: string;
+  twitter?: string;
+  address?: UserAddress;
+}
+
+export interface IUser {
+  _id: string;
+  name: string;
+  email: string;
+  // password, passwordHash, token, refreshToken → STRIPPED
+  role: UserRole;
+  isVerified: boolean;
+  isActive: boolean;
+  profile: UserProfile;
+  followersCount: number;
+  followingCount: number;
+  postsCount: number;
+  lastLoginAt: string; // Date → string
+  createdAt: string; // Date → string
+  updatedAt: string; // Date → string
+}
+
+export interface CreateUserDTO {
+  name: string;
+  email: string;
+  // password → STRIPPED
+  role?: UserRole;
+}
+
+export type UserRole = "admin" | "moderator" | "user";
+```
+
+**`frontend/src/types/generated/post.model.ts`**
+
+```ts
+// type-bridge — generated from: post.model.ts
+// Hash: 4215eae72bc1
+
+export interface IPost {
+  _id: string;
+  title: string;
+  content: string;
+  authorId: string;
+  status: PostStatus;
+  visibility: PostVisibility;
+  tags: string[];
+  meta: PostMeta;
+  likesCount: number;
+  commentsCount: number;
+  viewsCount: number;
+  publishedAt?: string; // Date → string
+  scheduledAt?: string; // Date → string
+  createdAt: string; // Date → string
+  updatedAt: string; // Date → string
+}
+
+// Enums converted to union types (preserveEnums: false)
+export type PostStatus = "draft" | "published" | "scheduled" | "archived";
+export type PostVisibility = "public" | "private" | "unlisted";
+```
+
+**`frontend/src/types/generated/auth.dto.ts`**
+
+```ts
+// type-bridge — generated from: auth.dto.ts
+// Hash: f6437c004772
+
+export interface LoginDTO {
+  email: string;
+  // password → STRIPPED
+}
+
+export interface LoginResponse {
+  // accessToken, refreshToken → STRIPPED (in excludeFields)
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: "admin" | "user";
+  };
+}
+
+// InternalServerMetadata → SKIPPED (@type-bridge-ignore)
+```
+
+**`frontend/src/types/generated/index.ts`** — barrel re-export:
+
+```ts
+export * from "./auth.dto";
+export * from "./post.model";
+export * from "./user.model";
+```
+
+### What the example proves
+
+| Backend feature                                       | What TypeBridge did                               |
+| ----------------------------------------------------- | ------------------------------------------------- |
+| `password`, `token`, `refreshToken` on `IUser`        | Stripped — never reaches frontend                 |
+| `Date` fields (`createdAt`, `publishedAt`, …)         | Converted to `string`                             |
+| `PostStatus` / `PostVisibility` enums                 | Converted to union types                          |
+| `accessToken` / `refreshToken` on `LoginResponse`     | Stripped via `excludeFields`                      |
+| `InternalServerMetadata` tagged `@type-bridge-ignore` | Entire type skipped                               |
+| Barrel `index.ts`                                     | Auto-generated — single import point for frontend |
+
+---
+
 ## Configuration
 
 TypeBridge uses [cosmiconfig](https://github.com/cosmiconfig/cosmiconfig) to find your config. Supported locations (in order):
 
-| File | Notes |
-|---|---|
-| `type-bridge.config.ts` | Recommended — full TypeScript support |
-| `type-bridge.config.js` / `.cjs` | JavaScript config |
-| `type-bridge.config.json` | JSON config |
-| `.typebridgerc` / `.typebridgerc.json` / `.typebridgerc.yaml` | RC files |
-| `package.json` → `"type-bridge"` key | Inline config |
+| File                                                          | Notes                                 |
+| ------------------------------------------------------------- | ------------------------------------- |
+| `type-bridge.config.ts`                                       | Recommended — full TypeScript support |
+| `type-bridge.config.js` / `.cjs`                              | JavaScript config                     |
+| `type-bridge.config.json`                                     | JSON config                           |
+| `.typebridgerc` / `.typebridgerc.json` / `.typebridgerc.yaml` | RC files                              |
+| `package.json` → `"type-bridge"` key                          | Inline config                         |
 
 ### All Options
 
@@ -247,14 +545,14 @@ interface TypeBridgeConfig {
 npx @joshianuvrat/type-bridge generate [options]
 ```
 
-| Option | Description |
-|---|---|
-| `--cwd <path>` | Working directory (default: `process.cwd()`) |
-| `--outDir <path>` | Override `outDir` from config |
-| `--sdk` | Enable SDK generation |
-| `--no-clean` | Skip cleaning the output directory |
-| `--no-prettier` | Skip Prettier formatting |
-| `--config <path>` | Path to a specific config file |
+| Option            | Description                                  |
+| ----------------- | -------------------------------------------- |
+| `--cwd <path>`    | Working directory (default: `process.cwd()`) |
+| `--outDir <path>` | Override `outDir` from config                |
+| `--sdk`           | Enable SDK generation                        |
+| `--no-clean`      | Skip cleaning the output directory           |
+| `--no-prettier`   | Skip Prettier formatting                     |
+| `--config <path>` | Path to a specific config file               |
 
 **Example:**
 
@@ -272,11 +570,11 @@ npx @joshianuvrat/type-bridge watch [options]
 
 Watches the source directory and re-runs `generate` on every change. Uses a 300 ms debounce to batch rapid saves.
 
-| Option | Description |
-|---|---|
-| `--cwd <path>` | Working directory |
-| `--outDir <path>` | Override `outDir` |
-| `--sdk` | Enable SDK generation |
+| Option            | Description           |
+| ----------------- | --------------------- |
+| `--cwd <path>`    | Working directory     |
+| `--outDir <path>` | Override `outDir`     |
+| `--sdk`           | Enable SDK generation |
 
 **Example:**
 
@@ -308,7 +606,9 @@ import { loadConfig, runPipeline } from "@joshianuvrat/type-bridge";
 const config = await loadConfig("/path/to/project");
 const result = await runPipeline({ config, cwd: "/path/to/project" });
 
-console.log(`Generated ${result.generatedFiles.length} file(s) in ${result.durationMs}ms`);
+console.log(
+  `Generated ${result.generatedFiles.length} file(s) in ${result.durationMs}ms`,
+);
 ```
 
 ### `loadConfig(cwd?)`
@@ -387,7 +687,10 @@ By default, TypeScript enums are converted to **string union types**:
 
 ```ts
 // Backend
-export enum Status { Active = "active", Inactive = "inactive" }
+export enum Status {
+  Active = "active",
+  Inactive = "inactive",
+}
 
 // Generated
 export type Status = "active" | "inactive";
@@ -502,8 +805,34 @@ type-bridge/
 │   └── utils/
 │       ├── logger.ts             # Chalk-based logger
 │       └── prettier.ts           # Prettier formatting helper
-├── type-bridge.config.ts            # Example config (self-referential)
+├── docs/                         # Full documentation (8 guides)
+│   ├── README.md                 # Docs index
+│   ├── 01-introduction.md
+│   ├── 02-configuration.md
+│   ├── 03-cli.md
+│   ├── 04-api.md
+│   ├── 05-recipes.md
+│   ├── 06-edge-cases.md
+│   ├── 07-sdk-generator.md
+│   └── 08-troubleshooting.md
+├── smoke-test/                   # End-to-end working example
+│   ├── type-bridge.config.ts
+│   ├── backend/
+│   │   └── src/
+│   │       ├── models/
+│   │       │   ├── user.model.ts
+│   │       │   └── post.model.ts
+│   │       └── dtos/
+│   │           └── auth.dto.ts
+│   └── frontend/
+│       └── src/
+│           └── types/
+│               └── generated/    # Output (gitignored)
+├── dist/                         # Compiled output (gitignored)
+├── .gitignore
+├── README.md
 ├── package.json
+├── package-lock.json
 ├── tsconfig.json
 ├── tsconfig.build.json
 └── jest.config.json
@@ -526,12 +855,12 @@ npm test -- --coverage
 
 Tests are written with **Jest + ts-jest**. Each module has its own `__tests__/` directory. Test strategy:
 
-| Module | Strategy |
-|---|---|
-| Extractor | Creates real temp `.ts` files → runs ts-morph extraction |
-| Transformer | Unit tests with in-memory `ExtractedDeclaration` objects |
-| Generator | Writes to `os.tmpdir()` → asserts file existence & content |
-| Config Loader | Creates real temp config files → asserts merged output |
+| Module        | Strategy                                                   |
+| ------------- | ---------------------------------------------------------- |
+| Extractor     | Creates real temp `.ts` files → runs ts-morph extraction   |
+| Transformer   | Unit tests with in-memory `ExtractedDeclaration` objects   |
+| Generator     | Writes to `os.tmpdir()` → asserts file existence & content |
+| Config Loader | Creates real temp config files → asserts merged output     |
 
 ---
 
